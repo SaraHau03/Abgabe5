@@ -45,5 +45,3 @@ if __name__ == "__main__" :
     #print(person_names_list)
     suchstring ='Schmirander , Yunus'
     print(find_person_data_by_name(suchstring))
-
-

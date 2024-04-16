@@ -1,6 +1,7 @@
 import streamlit as st
-from read_data import get_person_data, get_person_names
+from read_data import get_person_data, get_person_names, find_person_data_by_name
 from PIL import Image
+
 
 person_data = get_person_data()
 person_names_list = get_person_names(person_data)
@@ -21,8 +22,13 @@ st.session_state.current_user = st.selectbox(
     options = person_names_list, key="sbVersuchsperson")
 
 # Laden eines Bilds
-image = Image.open("data/pictures/js.jpg")
+person_dict = find_person_data_by_name(st.session_state.current_user)
+
+image = Image.open(person_dict["picture_path"])
 # Anzeigen eines Bilds mit Caption
+
 st.image(image, caption=st.session_state.current_user)
 
 st.write("Es wurde folgender Nutzer gewählt: " + st.session_state.current_user)
+
+
