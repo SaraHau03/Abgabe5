@@ -1,6 +1,7 @@
 import streamlit as st
 from read_data import get_person_data, get_person_names, find_person_data_by_name
 from PIL import Image
+import person
 
 
 person_data = get_person_data()
@@ -31,4 +32,5 @@ st.image(image, caption=st.session_state.current_user)
 
 st.write("Es wurde folgender Nutzer gewählt: " + st.session_state.current_user)
 
+st.write(person.Person.calc_age())
 

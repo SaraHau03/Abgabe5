@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+import pandas as pd
 
 class Person:
     
@@ -47,10 +49,31 @@ class Person:
         self.lastname = person_dict["lastname"]
         self.picture_path = person_dict["picture_path"]
         self.id = person_dict["id"]
+        
+
+    def calc_age(self):
+        today = datetime.now()
+        age = today.year - self.date_of_birth
+        self.age = age
+        return age
+    
+
+    def calc_max_heart_rate(self):
+        max_hr_bpm =  223 - 0.9 * self.calc_age()
+        return int(max_hr_bpm)
+
+    
+    def load_by_id(self):
+        
 
 if __name__ == "__main__":
     print("This is a module with some functions to read the person data")
     persons = Person.load_person_data()
     person_names = Person.get_person_list(persons)
     print(person_names)
-    print(Person.find_person_data_by_name("Huber, Julian"))
+    print(Person.find_person_data_by_name("Heyer, Yannic"))
+    selected_person = Person(Person.find_person_data_by_name("Heyer, Yannic"))
+    print(selected_person.calc_max_heart_rate())
+    
+
+    
