@@ -1,6 +1,8 @@
 import json
 import pandas as pd
 from scipy.signal import find_peaks
+import matplotlib.pyplot as plt
+
 
 class EKGdata:
     # Class variable to hold all EKG data
@@ -39,6 +41,27 @@ class EKGdata:
         peaks, _ = find_peaks(self.df['EKG in mV'], height=0)
         self.peaks = peaks
         print(f"Peaks found: {peaks}")
+    '''
+    def estimate_hr(self):
+        # Calculate heart rate based on the peaks
+        if hasattr(self, 'peaks'):
+            num_peaks = len(self.peaks)
+            duration = self.df['Time in ms'].iloc[-1] - self.df['Time in ms'].iloc[0]
+            heart_rate = (num_peaks / duration) * 60000  # Convert to beats per minute
+            print(f"Heart Rate: {heart_rate} bpm")
+        else:
+            print("No peaks found. Heart rate cannot be calculated.")
+    '''
+
+
+    def plot_time_series(self):
+        plt.figure(figsize=(12, 6))
+        plt.plot(self.df['Time in ms'], self.df['EKG in mV'], color='blue')
+        plt.scatter(self.df['Time in ms'][self.peaks], self.df['EKG in mV'][self.peaks], color='red', marker='x')
+        plt.xlabel('Time in ms')
+        plt.ylabel('EKG in mV')
+        plt.title('EKG Time Series with Peaks')
+        plt.show()
 
 if __name__ == "__main__":
     print("This is a module with some functions to read the EKG data")
@@ -64,6 +87,8 @@ if __name__ == "__main__":
             print("EKG Data loaded by ID:")
             ekg_by_id.display()
             ekg_by_id.find_peaks()
+           # ekg_by_id.estimate_hr()
+            ekg_by_id.plot_time_series()
         else:
             print("Keine EKG-Daten mit der gegebenen ID gefunden.")
     except ValueError:
