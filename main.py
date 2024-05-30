@@ -32,5 +32,4 @@ st.image(image, caption=st.session_state.current_user)
 
 st.write("Es wurde folgender Nutzer gewählt: " + st.session_state.current_user)
 
-st.write(person.Person.calc_age())
 

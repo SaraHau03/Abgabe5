@@ -1,62 +1,9 @@
 import json
 import pandas as pd
-import person
+from scipy.signal import find_peaks
+import matplotlib.pyplot as plt
 
-# %% Objekt-Welt
 
-# Klasse EKG-Data für Peakfinder, die uns ermöglicht peaks zu finden
-
-class EKGdata:
-
-## Konstruktor der Klasse soll die Daten einlesen
-
-    def __init__(self, ekg_dict):
-        pass
-        self.id = ekg_dict["id"]
-        self.date = ekg_dict["date"]
-        self.data = ekg_dict["result_link"]
-        self.df = pd.read_csv(self.data, sep='\t', header=None, names=['EKG in mV','Time in ms',])
-
-    @staticmethod
-    def find_ekg_data_by_id(self):
-        ekg_data = self.df
-        """A Function that takes an ID and returns the person as a dictionary"""
-        for eintrag in ekg_data:
-            if eintrag["id"] == ekg_data:
-                return eintrag
-        return {}
-    
-    @classmethod
-    def load_by_id(cls, ekg_dict):
-        ekgdict = cls.find_ekg_data_by_id(ekg_dict)
-        if ekgdict:
-            return cls(ekgdict)
-        else:
-            return None
-
-        
-
-if __name__ == "__main__":
-    print("This is a module with some functions to read the EKG data")
-    file = open("data/person_db.json")
-    person_data = json.load(file)
-    ekg_dict = person_data[0]["ekg_tests"][0]
-    print(ekg_dict)
-    ekg = EKGdata(ekg_dict)
-    print(ekg.df.head())
-
-    try:
-        ekg_id_input = int(input("Bitte geben Sie die ID der Person ein: "))
-        ekg_by_id = EKGdata.load_by_id(ekg_id_input)
-        if ekg_by_id:
-            print(f"Person loaded by ID:", ekg_by_id)
-            #print(f"Max Herzfrequenz: {ekg_by_id.calc_max_heart_rate()} bpm")
-        else:
-            print("Keine Person mit der gegebenen ID gefunden.")
-    except ValueError:
-        print("Bitte geben Sie eine gültige numerische ID ein.")
-
-###################
 class EKGdata:
     # Class variable to hold all EKG data
     all_ekg_data = []
@@ -76,10 +23,10 @@ class EKGdata:
         return None
 
     @classmethod
-    def load_by_id(cls, ekg_id):
-        ekg_dict = cls.find_ekg_data_by_id(ekg_id)
+    def load_by_id(self,ekg_id_input):
+        ekg_dict = self.find_ekg_data_by_id(ekg_id_input)
         if ekg_dict:
-            return cls(ekg_dict)
+            return self(ekg_dict)
         else:
             return None
 
@@ -89,28 +36,55 @@ class EKGdata:
         print(f"Data File: {self.data}")
         print(f"EKG Data (first 5 rows):\n{self.df.head()}")
 
-if __name__ == "__main__":
-    print("This is a module with some functions to read the EKG data")
+    def find_peaks(self):
+        # Find peaks in the EKG data
+        peaks, _ = find_peaks(self.df['EKG in mV'], height=0)
+        self.peaks = peaks
+        print(f"Peaks gefunden bei: {peaks}")
+    '''
+    def estimate_hr(self):
+        # Calculate heart rate based on the peaks
+        if hasattr(self, 'peaks'):
+            num_peaks = len(self.peaks)
+            duration = self.df['Time in ms'].iloc[-1] - self.df['Time in ms'].iloc[0]
+            heart_rate = (num_peaks / duration) * 60000  # Convert to beats per minute
+            print(f"Heart Rate: {heart_rate} bpm")
+        else:
+            print("No peaks found. Heart rate cannot be calculated.")
+    '''
+
     
+    def plot_time_series(self):
+        plt.figure(figsize=(12, 6))
+        plt.plot(self.df['Time in ms'], self.df['EKG in mV'], color='blue')
+        plt.scatter(self.df['Time in ms'][self.peaks], self.df['EKG in mV'][self.peaks], color='red', marker='x')
+        plt.xlabel('Time in ms')
+        plt.ylabel('EKG in mV')
+        plt.title('EKG Time Series with Peaks')
+        plt.show()
+    
+
+if __name__ == "__main__":
+    print("Welcome to the EKG Data Analysis Tool!")
+    
+
     # Load person data and populate all_ekg_data class variable
     with open("data/person_db.json") as file:
         person_data = json.load(file)
     
     for person in person_data:
         EKGdata.all_ekg_data.extend(person["ekg_tests"])
-    
-    # Example usage
-    ekg_dict = person_data[0]["ekg_tests"][0]
-    print(ekg_dict)
-    ekg = EKGdata(ekg_dict)
-    print(ekg.df.head())
 
+   
     try:
         ekg_id_input = int(input("Bitte geben Sie die ID der Person ein: "))
         ekg_by_id = EKGdata.load_by_id(ekg_id_input)
         if ekg_by_id:
             print("EKG Data loaded by ID:")
             ekg_by_id.display()
+            ekg_by_id.find_peaks()
+           # ekg_by_id.estimate_hr()
+            ekg_by_id.plot_time_series()
         else:
             print("Keine EKG-Daten mit der gegebenen ID gefunden.")
     except ValueError:
