@@ -72,10 +72,10 @@ class Person:
         return int(max_hr_bpm)
 
     @classmethod
-    def load_by_id(cls, person_id):
-        person_dict = cls.find_person_data_by_id(person_id)
+    def load_by_id(self, person_id):
+        person_dict = self.find_person_data_by_id(person_id)
         if person_dict:
-            return cls(person_dict)
+            return self(person_dict)
         else:
             return None
         
