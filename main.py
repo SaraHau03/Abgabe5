@@ -1,8 +1,9 @@
 import streamlit as st
 from ekgdata import EKGdata
 from person import Person
+from datetime import datetime
 
-def main():
+if __name__ == "__main__":
     st.title("EKG Data Analysis Tool")
 
     # Load person data and populate all_ekg_data class variable
@@ -15,9 +16,13 @@ def main():
     if selected_person_name != "Auswählen":
         person_dict = Person.find_person_data_by_name(selected_person_name)
         if person_dict:
-            st.write(f"Name: {person_dict['firstname']} {person_dict['lastname']}")
-            st.write(f"Geburtsdatum: {person_dict['date_of_birth']}")
-            st.image(person_dict['picture_path'])
+            person_objekt = Person(person_dict)
+            st.write(f"Name: {person_objekt.firstname} {person_objekt.lastname}")
+            st.write(f"Geburtsdatum: {person_objekt.date_of_birth}")
+            st.image(person_objekt.picture_path)
+            st.write("Alter:", person_objekt.calc_age())
+            st.write("Die maximale Herzfrequenz beträgt:", person_objekt.calc_max_heart_rate(), "bpm")
+        
 
             selected_ekg_id = st.selectbox("Wählen Sie eine EKG-ID", [ekg["id"] for ekg in person_dict["ekg_tests"]])
             if selected_ekg_id:
@@ -32,5 +37,3 @@ def main():
         else:
             st.write("Keine Person mit diesem Namen gefunden.")
 
-if __name__ == "__main__":
-    main()

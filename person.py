@@ -51,8 +51,16 @@ class Person:
             if eintrag["id"] == person_id:
                 return eintrag
         return {}
+    
+    @classmethod
+    def load_by_id(self, person_id):
+        person_dict = self.find_person_data_by_id(person_id)
+        if person_dict:
+            return self(person_dict)
+        else:
+            return None
         
-    def __init__(self, person_dict) -> None:
+    def __init__(self, person_dict):
         self.date_of_birth = person_dict["date_of_birth"]
         self.firstname = person_dict["firstname"]
         self.lastname = person_dict["lastname"]
@@ -69,37 +77,8 @@ class Person:
 
     def calc_max_heart_rate(self):
         max_hr_bpm =  223 - 0.9 * self.calc_age()
+        self.max_hr_bpm = max_hr_bpm
         return int(max_hr_bpm)
 
-    @classmethod
-    def load_by_id(self, person_id):
-        person_dict = self.find_person_data_by_id(person_id)
-        if person_dict:
-            return self(person_dict)
-        else:
-            return None
-        
-        
-'''
-if __name__ == "__main__":
-    print("This is a module with some functions to read the person data")
-    persons = Person.load_person_data()
-    person_names = Person.get_person_list(persons)
-    print(person_names)
-    print(Person.find_person_data_by_name("Heyer, Yannic"))
-    selected_person = Person(Person.find_person_data_by_name("Heyer, Yannic"))
-    print(selected_person.calc_max_heart_rate())
-    
-
-    try:
-        person_id_input = int(input("Bitte geben Sie die ID der Person ein: "))
-        person_by_id = Person.load_by_id(person_id_input)
-        if person_by_id:
-            print(f"Person loaded by ID: {person_by_id.firstname} {person_by_id.lastname}")
-            print(f"Das Alter beträgt:",person_by_id.calc_age())
-            print(f"Max Herzfrequenz: {person_by_id.calc_max_heart_rate()} bpm")
-        else:
-            print("Keine Person mit der gegebenen ID gefunden.")
-    except ValueError:
-        print("Bitte geben Sie eine gültige numerische ID ein.")
-'''
+ 
+   
