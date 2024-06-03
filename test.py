@@ -1,95 +1,67 @@
+import streamlit as st
+from read_data import get_person_data, get_person_names, find_person_data_by_name
+from PIL import Image
+from person import Person
+from ekgdata import EKGdata
 import json
-import pandas as pd
-from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
 
+# Funktionen zum Laden und Anzeigen der Personendaten
+def display_person_info(person_name):
+    person_dict = find_person_data_by_name(person_name)
+    image = Image.open(person_dict["picture_path"])
+    st.image(image, caption=person_name)
+    st.write("Es wurde folgender Nutzer gewählt: " + person_name)
 
-class EKGdata:
-    # Class variable to hold all EKG data
-    all_ekg_data = []
+# Funktionen zum Laden und Anzeigen der EKG-Daten
+def display_ekg_data(ekg_id):
+    ekg_data = EKGdata.load_by_id(ekg_id)
+    if ekg_data:
+        st.write("EKG Data loaded by ID:")
+        ekg_data.display()
+        ekg_data.find_peaks()
+        ekg_data.estimate_hr()
+        ekg_data.plot_time_series()
+    else:
+        st.write("Keine EKG-Daten mit der gegebenen ID gefunden.")
 
-    def __init__(self, ekg_dict):
-        self.id = ekg_dict["id"]
-        self.date = ekg_dict["date"]
-        self.data = ekg_dict["result_link"]
-        self.df = pd.read_csv(self.data, sep='\t', header=None, names=['EKG in mV', 'Time in ms'])
+# Hauptfunktion der Streamlit-App
+def main():
+    # Laden der Personendaten
+    person_data = get_person_data()
+    person_names_list = get_person_names(person_data)
 
-    @staticmethod
-    def find_ekg_data_by_id(ekg_id):
-        """A Function that takes an ID and returns the EKG data as a dictionary"""
-        for ekg_dict in EKGdata.all_ekg_data:
-            if ekg_dict["id"] == ekg_id:
-                return ekg_dict
-        return None
+    # Session State wird leer angelegt, solange er noch nicht existiert
+    if 'current_user' not in st.session_state:
+        st.session_state.current_user = 'None'
+    if 'ekg_ids' not in st.session_state:
+        st.session_state.ekg_ids = []
 
-    @classmethod
-    def load_by_id(self,ekg_id_input):
-        ekg_dict = self.find_ekg_data_by_id(ekg_id_input)
-        if ekg_dict:
-            return self(ekg_dict)
-        else:
-            return None
+    # Überschriften
+    st.write("# EKG APP")
+    st.write("## Versuchsperson auswählen")
 
-    def display(self):
-        print(f"ID: {self.id}")
-        print(f"Date: {self.date}")
-        print(f"Data File: {self.data}")
-        print(f"EKG Data (first 5 rows):\n{self.df.head()}")
+    # Auswahlbox für Versuchsperson
+    st.session_state.current_user = st.selectbox(
+        'Versuchsperson',
+        options=person_names_list, key="sbVersuchsperson")
 
-    def find_peaks(self):
-        # Find peaks in the EKG data
-        peaks, _ = find_peaks(self.df['EKG in mV'], height=0)
-        self.peaks = peaks
-        print(f"Peaks found: {peaks}")
-    '''
-    def estimate_hr(self):
-        # Calculate heart rate based on the peaks
-        if hasattr(self, 'peaks'):
-            num_peaks = len(self.peaks)
-            duration = self.df['Time in ms'].iloc[-1] - self.df['Time in ms'].iloc[0]
-            heart_rate = (num_peaks / duration) * 60000  # Convert to beats per minute
-            print(f"Heart Rate: {heart_rate} bpm")
-        else:
-            print("No peaks found. Heart rate cannot be calculated.")
-    '''
+    # Anzeigen der ausgewählten Personendaten
+    if st.session_state.current_user != 'None':
+        display_person_info(st.session_state.current_user)
+        
+        # Finden der Personendaten und Anzeigen der EKG-IDs
+        person_dict = find_person_data_by_name(st.session_state.current_user)
+        st.session_state.ekg_ids = [ekg["id"] for ekg in person_dict["ekg_tests"]]
+        
+        # Auswahlbox für EKG-IDs
+        ekg_id = st.selectbox(
+            'EKG ID auswählen',
+            options=st.session_state.ekg_ids, key="sbEkgId")
+        
+        # Button zum Laden der EKG-Daten
+        if st.button("EKG-Daten anzeigen"):
+            display_ekg_data(ekg_id)
 
-
-    def plot_time_series(self):
-        plt.figure(figsize=(12, 6))
-        plt.plot(self.df['Time in ms'], self.df['EKG in mV'], color='blue')
-        plt.scatter(self.df['Time in ms'][self.peaks], self.df['EKG in mV'][self.peaks], color='red', marker='x')
-        plt.xlabel('Time in ms')
-        plt.ylabel('EKG in mV')
-        plt.title('EKG Time Series with Peaks')
-        plt.show()
-
+# Ausführung der Hauptfunktion
 if __name__ == "__main__":
-    print("This is a module with some functions to read the EKG data")
-    
-
-    # Load person data and populate all_ekg_data class variable
-    with open("data/person_db.json") as file:
-        person_data = json.load(file)
-    
-    for person in person_data:
-        EKGdata.all_ekg_data.extend(person["ekg_tests"])
-
-    # Example usage
-    ekg_dict = person_data[0]["ekg_tests"][0]
-    print(ekg_dict)
-    ekg = EKGdata(ekg_dict)
-    print(ekg.df.head())
-   
-    try:
-        ekg_id_input = int(input("Bitte geben Sie die ID der Person ein: "))
-        ekg_by_id = EKGdata.load_by_id(ekg_id_input)
-        if ekg_by_id:
-            print("EKG Data loaded by ID:")
-            ekg_by_id.display()
-            ekg_by_id.find_peaks()
-           # ekg_by_id.estimate_hr()
-            ekg_by_id.plot_time_series()
-        else:
-            print("Keine EKG-Daten mit der gegebenen ID gefunden.")
-    except ValueError:
-        print("Bitte geben Sie eine gültige numerische ID ein.")
+    main()

@@ -41,17 +41,18 @@ class EKGdata:
         peaks, _ = find_peaks(self.df['EKG in mV'], height=0)
         self.peaks = peaks
         print(f"Peaks gefunden bei: {peaks}")
-    '''
+        return peaks
+    
     def estimate_hr(self):
         # Calculate heart rate based on the peaks
-        if hasattr(self, 'peaks'):
+        if find_peaks is not None:
             num_peaks = len(self.peaks)
             duration = self.df['Time in ms'].iloc[-1] - self.df['Time in ms'].iloc[0]
             heart_rate = (num_peaks / duration) * 60000  # Convert to beats per minute
             print(f"Heart Rate: {heart_rate} bpm")
         else:
             print("No peaks found. Heart rate cannot be calculated.")
-    '''
+
 
     
     def plot_time_series(self):
@@ -83,7 +84,7 @@ if __name__ == "__main__":
             print("EKG Data loaded by ID:")
             ekg_by_id.display()
             ekg_by_id.find_peaks()
-           # ekg_by_id.estimate_hr()
+            ekg_by_id.estimate_hr()
             ekg_by_id.plot_time_series()
         else:
             print("Keine EKG-Daten mit der gegebenen ID gefunden.")

@@ -80,7 +80,7 @@ class Person:
             return None
         
         
-
+'''
 if __name__ == "__main__":
     print("This is a module with some functions to read the person data")
     persons = Person.load_person_data()
@@ -102,3 +102,4 @@ if __name__ == "__main__":
             print("Keine Person mit der gegebenen ID gefunden.")
     except ValueError:
         print("Bitte geben Sie eine gültige numerische ID ein.")
+'''
