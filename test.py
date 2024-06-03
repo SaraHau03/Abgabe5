@@ -1,67 +1,41 @@
 import streamlit as st
-from read_data import get_person_data, get_person_names, find_person_data_by_name
-from PIL import Image
-from person import Person
 from ekgdata import EKGdata
-import json
+from person import Person
 
-# Funktionen zum Laden und Anzeigen der Personendaten
-def display_person_info(person_name):
-    person_dict = find_person_data_by_name(person_name)
-    image = Image.open(person_dict["picture_path"])
-    st.image(image, caption=person_name)
-    st.write("Es wurde folgender Nutzer gewählt: " + person_name)
-
-# Funktionen zum Laden und Anzeigen der EKG-Daten
-def display_ekg_data(ekg_id):
-    ekg_data = EKGdata.load_by_id(ekg_id)
-    if ekg_data:
-        st.write("EKG Data loaded by ID:")
-        ekg_data.display()
-        ekg_data.find_peaks()
-        ekg_data.estimate_hr()
-        ekg_data.plot_time_series()
-    else:
-        st.write("Keine EKG-Daten mit der gegebenen ID gefunden.")
-
-# Hauptfunktion der Streamlit-App
 def main():
-    # Laden der Personendaten
-    person_data = get_person_data()
-    person_names_list = get_person_names(person_data)
+    st.title("EKG Data Analysis Tool")
 
-    # Session State wird leer angelegt, solange er noch nicht existiert
-    if 'current_user' not in st.session_state:
-        st.session_state.current_user = 'None'
-    if 'ekg_ids' not in st.session_state:
-        st.session_state.ekg_ids = []
+    # Load person data and populate all_ekg_data class variable
+    person_data = Person.load_person_data()
+    for person in person_data:
+        EKGdata.all_ekg_data.extend(person["ekg_tests"])
 
-    # Überschriften
-    st.write("# EKG APP")
-    st.write("## Versuchsperson auswählen")
+    person_names = Person.get_person_list(person_data)
+    selected_person_name = st.selectbox("Wählen Sie eine Person", ["Auswählen"] + person_names)
+    if selected_person_name != "Auswählen":
+        person_dict = Person.find_person_data_by_name(selected_person_name)
+        if person_dict:
+            st.write(f"Name: {person_dict['firstname']} {person_dict['lastname']}")
+            st.write(f"Geburtsdatum: {person_dict['date_of_birth']}")
+            st.image(person_dict['picture_path'])
 
-    # Auswahlbox für Versuchsperson
-    st.session_state.current_user = st.selectbox(
-        'Versuchsperson',
-        options=person_names_list, key="sbVersuchsperson")
+            selected_ekg_id = st.selectbox("Wählen Sie eine EKG-ID", [ekg["id"] for ekg in person_dict["ekg_tests"]])
+            if selected_ekg_id:
+                ekg_by_id = EKGdata.load_by_id(selected_ekg_id)
+                if ekg_by_id:
+                    # Finde das EKG-Testobjekt mit der ausgewählten ID
+                    ekg_test = next((ekg for ekg in person_dict["ekg_tests"] if ekg["id"] == selected_ekg_id))
+                    if ekg_test:
+                        st.write(f"Test Datum: {ekg_test['date']}")
 
-    # Anzeigen der ausgewählten Personendaten
-    if st.session_state.current_user != 'None':
-        display_person_info(st.session_state.current_user)
-        
-        # Finden der Personendaten und Anzeigen der EKG-IDs
-        person_dict = find_person_data_by_name(st.session_state.current_user)
-        st.session_state.ekg_ids = [ekg["id"] for ekg in person_dict["ekg_tests"]]
-        
-        # Auswahlbox für EKG-IDs
-        ekg_id = st.selectbox(
-            'EKG ID auswählen',
-            options=st.session_state.ekg_ids, key="sbEkgId")
-        
-        # Button zum Laden der EKG-Daten
-        if st.button("EKG-Daten anzeigen"):
-            display_ekg_data(ekg_id)
+                    st.write("Die Herzfrequenz lautet:")
+                    ekg_by_id.find_peaks(threshold=320, distance=150)
+                    st.write(ekg_by_id.estimate_hr())
+                    st.plotly_chart(ekg_by_id.plot_time_series())
+                else:
+                    st.write("Keine EKG-Daten mit der gegebenen ID gefunden.")
+        else:
+            st.write("Keine Person mit diesem Namen gefunden.")
 
-# Ausführung der Hauptfunktion
 if __name__ == "__main__":
     main()
