@@ -2,6 +2,8 @@ import json
 import pandas as pd
 import scipy.signal
 import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objs as go
 
 
 class EKGdata:
@@ -30,15 +32,11 @@ class EKGdata:
         else:
             return None
 
-    def display(self):
-        print(f"ID: {self.id}")
-        print(f"Date: {self.date}")
-        print(f"Data File: {self.data}")
-        print(f"EKG Data (first 5 rows):\n{self.df.head()}")
+    
 
-    def find_peaks(self, threshold, distance):
+    def find_peaks(self, threshold,distance):
         series = self.df['EKG in mV']
-        peaks, _ = scipy.signal.find_peaks(series, height=threshold, distance=distance)
+        peaks, _ = scipy.signal.find_peaks(series, height=threshold,distance=distance)
         self.peaks = peaks
         return peaks
     
@@ -50,18 +48,37 @@ class EKGdata:
             print(f"Heart Rate: {heart_rate:.2f} bpm")
         else:
             print("No peaks found. Heart rate cannot be calculated.")
-
+        self.heart_rate = heart_rate
+        return heart_rate
     
     def plot_time_series(self):
-        plt.figure(figsize=(12, 6))
-        plt.plot(self.df['Time in ms'], self.df['EKG in mV'], color='blue')
-        plt.scatter(self.df['Time in ms'][self.peaks], self.df['EKG in mV'][self.peaks], color='red', marker='x')
-        plt.xlabel('Time in ms')
-        plt.ylabel('EKG in mV')
-        plt.title('EKG Time Series with Peaks')
-        plt.show()
+        fig = go.Figure()
+        
+        # Add EKG time series data
+        fig.add_trace(go.Scatter(x=self.df['Time in ms'], y=self.df['EKG in mV'],
+                                 mode='lines', name='EKG in mV'))
+        
+        # Add peaks
+        if self.peaks is not None:
+            fig.add_trace(go.Scatter(x=self.df['Time in ms'].iloc[self.peaks], 
+                                     y=self.df['EKG in mV'].iloc[self.peaks],
+                                     mode='markers', name='Peaks',
+                                     marker=dict(color='red', size=10, symbol='x')))
+        
+        fig.update_layout(title='EKG Time Series with Peaks',
+                          xaxis_title='Time in ms',
+                          yaxis_title='EKG in mV')
+        
+        return fig
+'''
+    def display(self):
+        print(f"ID: {self.id}")
+        print(f"Date: {self.date}")
+        print(f"Data File: {self.data}")
+        print(f"EKG Data (first 5 rows):\n{self.df.head()}")
+'''
     
-
+'''
 if __name__ == "__main__":
     print("Welcome to the EKG Data Analysis Tool!")
     
@@ -80,10 +97,11 @@ if __name__ == "__main__":
         if ekg_by_id:
             print("EKG Data loaded by ID:")
             ekg_by_id.display()
-            ekg_by_id.find_peaks(threshold=0.5, distance=150)  
+            ekg_by_id.find_peaks(threshold=320,distance=150)  
             ekg_by_id.estimate_hr()
             ekg_by_id.plot_time_series()
         else:
             print("Keine EKG-Daten mit der gegebenen ID gefunden.")
     except ValueError:
         print("Bitte geben Sie eine gültige numerische ID ein.")
+'''
