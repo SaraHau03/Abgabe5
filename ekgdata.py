@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from scipy.signal import find_peaks
+import scipy.signal
 import matplotlib.pyplot as plt
 
 
@@ -37,6 +37,7 @@ class EKGdata:
         print(f"EKG Data (first 5 rows):\n{self.df.head()}")
 
     def find_peaks(self):
+        scipy.signal 
         # Find peaks in the EKG data
         peaks, _ = find_peaks(self.df['EKG in mV'], height=0)
         self.peaks = peaks
@@ -44,7 +45,7 @@ class EKGdata:
         return peaks
     
     def estimate_hr(self):
-        # Calculate heart rate based on the peaks
+        #Berrechne die durchschnittliche herzfrequenz
         if find_peaks is not None:
             num_peaks = len(self.peaks)
             duration = self.df['Time in ms'].iloc[-1] - self.df['Time in ms'].iloc[0]
