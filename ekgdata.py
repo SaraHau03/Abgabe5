@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-import scipy.signal
+#import scipy.signal
 import matplotlib.pyplot as plt
 
 
@@ -36,12 +36,27 @@ class EKGdata:
         print(f"Data File: {self.data}")
         print(f"EKG Data (first 5 rows):\n{self.df.head()}")
 
-    def find_peaks(self):
-        scipy.signal 
-        # Find peaks in the EKG data
-        peaks, _ = find_peaks(self.df['EKG in mV'], height=0)
+   
+    def find_peaks(self, series, threshold, respacing_factor=5):
+    # Respace the series
+        series = series.iloc[::respacing_factor]
+    # Filter the series
+        series = series[series>threshold]
+
+
+        peaks = []
+        last = 0
+        current = 0
+        next = 0
+
+        for index, row in series.items():
+            last = current
+            current = next
+            next = row
+
+            if last < current and current > next and current > threshold:
+                peaks.append(index-respacing_factor)
         self.peaks = peaks
-        print(f"Peaks gefunden bei: {peaks}")
         return peaks
     
     def estimate_hr(self):
