@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-#import scipy.signal
+import scipy.signal
 import matplotlib.pyplot as plt
 
 
@@ -36,39 +36,20 @@ class EKGdata:
         print(f"Data File: {self.data}")
         print(f"EKG Data (first 5 rows):\n{self.df.head()}")
 
-   
-    def find_peaks(self, series, threshold, respacing_factor=5):
-    # Respace the series
-        series = series.iloc[::respacing_factor]
-    # Filter the series
-        series = series[series>threshold]
-
-
-        peaks = []
-        last = 0
-        current = 0
-        next = 0
-
-        for index, row in series.items():
-            last = current
-            current = next
-            next = row
-
-            if last < current and current > next and current > threshold:
-                peaks.append(index-respacing_factor)
+    def find_peaks(self, threshold, distance):
+        series = self.df['EKG in mV']
+        peaks, _ = scipy.signal.find_peaks(series, height=threshold, distance=distance)
         self.peaks = peaks
         return peaks
     
     def estimate_hr(self):
-        #Berrechne die durchschnittliche herzfrequenz
-        if find_peaks is not None:
+        if self.peaks is not None:
             num_peaks = len(self.peaks)
             duration = self.df['Time in ms'].iloc[-1] - self.df['Time in ms'].iloc[0]
             heart_rate = (num_peaks / duration) * 60000  # Convert to beats per minute
-            print(f"Heart Rate: {heart_rate} bpm")
+            print(f"Heart Rate: {heart_rate:.2f} bpm")
         else:
             print("No peaks found. Heart rate cannot be calculated.")
-
 
     
     def plot_time_series(self):
@@ -99,7 +80,7 @@ if __name__ == "__main__":
         if ekg_by_id:
             print("EKG Data loaded by ID:")
             ekg_by_id.display()
-            ekg_by_id.find_peaks()
+            ekg_by_id.find_peaks(threshold=0.5, distance=150)  
             ekg_by_id.estimate_hr()
             ekg_by_id.plot_time_series()
         else:
