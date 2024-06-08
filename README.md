@@ -1,4 +1,4 @@
-# Projektbeschreibung
+# Beschreibung der APP
 Dieses Projekt hat das Ziel, Personen in einem Dashboard anzuzeigen und EKG-Daten zu visualisieren. Das Dashboard ermöglicht es, Peaks in den EKG-Daten zu identifizieren und die Herzfrequenz zu berechnen.
 
 # Installation und Ausführung
