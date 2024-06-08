@@ -70,38 +70,3 @@ class EKGdata:
                           yaxis_title='EKG in mV')
         
         return fig
-'''
-    def display(self):
-        print(f"ID: {self.id}")
-        print(f"Date: {self.date}")
-        print(f"Data File: {self.data}")
-        print(f"EKG Data (first 5 rows):\n{self.df.head()}")
-'''
-    
-'''
-if __name__ == "__main__":
-    print("Welcome to the EKG Data Analysis Tool!")
-    
-
-    # Load person data and populate all_ekg_data class variable
-    with open("data/person_db.json") as file:
-        person_data = json.load(file)
-    
-    for person in person_data:
-        EKGdata.all_ekg_data.extend(person["ekg_tests"])
-
-   
-    try:
-        ekg_id_input = int(input("Bitte geben Sie die ID der Person ein: "))
-        ekg_by_id = EKGdata.load_by_id(ekg_id_input)
-        if ekg_by_id:
-            print("EKG Data loaded by ID:")
-            ekg_by_id.display()
-            ekg_by_id.find_peaks(threshold=320,distance=150)  
-            ekg_by_id.estimate_hr()
-            ekg_by_id.plot_time_series()
-        else:
-            print("Keine EKG-Daten mit der gegebenen ID gefunden.")
-    except ValueError:
-        print("Bitte geben Sie eine gültige numerische ID ein.")
-'''
