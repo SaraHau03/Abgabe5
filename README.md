@@ -1,17 +1,9 @@
-`python -m venv .venv`
-`.venv\Scripts\Activate`
-`pip install streamlit`
-`pip freeze > requirements.txt`
-`streamlit run main.py`
-
-
-
-## Projektbeschreibung
+# Projektbeschreibung
 Dieses Projekt hat das Ziel, Personen in einem Dashboard anzuzeigen und EKG-Daten zu visualisieren. Das Dashboard ermöglicht es, Peaks in den EKG-Daten zu identifizieren und die Herzfrequenz zu berechnen.
 
-## Installation und Ausführung
+# Installation und Ausführung
 
-### Setup
+## Setup
 
 1. Erstellen Sie eine virtuelle Umgebung:
     ```sh
@@ -23,8 +15,7 @@ Dieses Projekt hat das Ziel, Personen in einem Dashboard anzuzeigen und EKG-Date
     .venv\Scripts\Activate
     ```
 
-3. Installieren Sie die benötigten Bibliotheken:
-    zum Beispiel:
+3. Installieren Sie die benötigten Bibliotheken, wie zum Beispiel:
     ```sh
     pip install streamlit
     ```
