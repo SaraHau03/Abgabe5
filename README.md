@@ -36,16 +36,16 @@ Dieses Projekt hat das Ziel, Personen in einem Dashboard anzuzeigen und EKG-Date
 Die Personen-Klasse repräsentiert eine Person und enthält Methoden zur Berechnung des Alters und der maximalen Herzfrequenz. Die Klasse kann Personen aus einer JSON-Datenbank laden.
 
 Methoden der Person-Klasse:
-`calc_age()`: Berechnet das Alter basierend auf dem Geburtsjahr.
-`calc_max_heart_rate()`: Berechnet die maximale Herzfrequenz basierend auf dem Alter und Geschlecht.
-`load_by_id()`: Instanziiert eine Person anhand der ID und der Datenbank.
-`load_person_data()`: Lädt die Personendaten aus einer JSON-Datei (statische Methode).
+- `calc_age()`: Berechnet das Alter basierend auf dem Geburtsjahr.
+- `calc_max_heart_rate()`: Berechnet die maximale Herzfrequenz basierend auf dem Alter und Geschlecht.
+- `load_by_id()`: Instanziiert eine Person anhand der ID und der Datenbank.
+- `load_person_data()`: Lädt die Personendaten aus einer JSON-Datei (statische Methode).
 
 ### EKG-Test-Klasse (`ekgdata.py`)
 Die Ekg-Test-Klasse repräsentiert einen EKG-Test und enthält Methoden zur Analyse und Visualisierung der EKG-Daten.
 
 Methoden der EKG-Test-Klasse:
-`load_by_id()`: Instanziiert einen EKG-Test anhand der ID und der Datenbank.
-`find_peaks()`: Findet Peaks in den EKG-Daten und fügt diese als Attribut hinzu.
-`estimate_hr()`: Berechnet die Herzfrequenz basierend auf den Peaks.
-`plot_time_series()`: Erstellt einen Plot der EKG-Daten mit gefundenen Peaks.
+- `load_by_id()`: Instanziiert einen EKG-Test anhand der ID und der Datenbank.
+- `find_peaks()`: Findet Peaks in den EKG-Daten und fügt diese als Attribut hinzu.
+- `estimate_hr()`: Berechnet die Herzfrequenz basierend auf den Peaks.
+- `plot_time_series()`: Erstellt einen Plot der EKG-Daten mit gefundenen Peaks.
